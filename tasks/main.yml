@@ -24,7 +24,16 @@
   register: fail2baninstall
   tags: fail2ban
 
-- name: Copy jail config file
+- name: Copy Jail Config File
   copy: src=/etc/fail2ban/jail.conf dest=/etc/fail2ban/jail.local remote_src=True
   when: fail2baninstall|succeeded
   tags: fail2ban
+
+- name: Disallow SSH Password Authentication
+  lineinfile: dest=/etc/ssh/sshd_config
+              regexp="^PasswordAuthentication"
+              line="PasswordAuthentication no"
+              state=present
+  notify:
+    - Restart SSH
+  tags: sshpasswordauth
