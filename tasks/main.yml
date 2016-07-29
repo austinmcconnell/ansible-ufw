@@ -1,0 +1,30 @@
+---
+- name: Enable UFW
+  ufw: state=enabled
+  become: true
+  tags: ufw
+
+- name: Allow SSH
+  ufw: rule=limit port=ssh proto=tcp
+  become: true
+  tags: ufw
+
+- name: Allow HTTP
+  ufw: rule=allow port=http
+  become: true
+  tags: ufw
+
+- name: Allow HTTPS
+  ufw: rule=allow port=https
+  become: true
+  tags: ufw
+
+- name: Install Fail2Ban
+  apt: name=fail2ban state=latest update_cache=yes
+  register: fail2baninstall
+  tags: fail2ban
+
+- name: Copy jail config file
+  copy: src=/etc/fail2ban/jail.conf dest=/etc/fail2ban/jail.local remote_src=True
+  when: fail2baninstall|succeeded
+  tags: fail2ban
